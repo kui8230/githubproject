@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>                        
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+                        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd  
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context-4.0.xsd  
+                        http://www.springframework.org/schema/mvc  
+                        http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+                        http://www.springframework.org/schema/aop 
+                        http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+                        http://www.springframework.org/schema/tx 
+                        http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+                        http://www.springframework.org/schema/cache
+                        http://www.springframework.org/schema/cache/spring-cache-4.0.xsd">                        
+    
+    <!-- 自动扫描该包，使SpringMVC认为包下用了@controller注解的类是控制器 -->
+	<context:component-scan base-package="com.oracle"/>
+	<!-- 默认的注解映射的支持 -->  
+	<mvc:annotation-driven /> 
+	
+	
+	<!-- 静态资源(js/image/css)的访问,两个星号表示该目录下子目录递归 -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+	
+	<!-- 定义跳转的文件的前后缀 ，视图模式配置-->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/pages/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<!-- 配置文件上传，如果没有使用文件上传可以不用配置，当然如果不配，那么配置文件中也不必引入上传组件包 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+        <!-- 默认编码 -->
+        <property name="defaultEncoding" value="gb2312" />  
+        <!-- 文件大小最大值 -->
+        <property name="maxUploadSize" value="10485760000" />
+    </bean> 
+    
+    <!-- spring mvc 整合 mybatis -->
+    <!-- 事务管理-->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+   <!-- 用来启用基于注解的事务 -->
+   <tx:annotation-driven transaction-manager="txManager"/>
+   
+	<!-- 引入配置文件 -->
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:jdbc.properties" />
+	</bean>
+	<bean id="dataSourceLocal" name="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">  
+        <!-- 指定连接数据库的驱动-->  
+        <property name="driverClass" value="${jdbc.driverClassName}"/>  
+        <!-- 指定连接数据库的URL-->  
+        <property name="jdbcUrl" value="${jdbc.url}"/>  
+        <!-- 指定连接数据库的用户名-->  
+        <property name="user" value="${jdbc.username}"/>  
+        <!-- 指定连接数据库的密码-->  
+        <property name="password" value="${jdbc.password}"/>  
+        <!-- 指定连接池中保留的最大连接数. Default:15-->  
+        <property name="maxPoolSize" value="${jdbc.maxPoolSize}"/>  
+        <!-- 指定连接池中保留的最小连接数-->  
+        <property name="minPoolSize" value="${jdbc.minPoolSize}"/>  
+        <!-- 指定连接池的初始化连接数  取值应在minPoolSize 与 maxPoolSize 之间.Default:3-->  
+        <property name="initialPoolSize" value="${jdbc.initialPoolSize}"/>  
+        <!-- 最大空闲时间,60秒内未使用则连接被丢弃。若为0则永不丢弃。 Default:0-->  
+        <property name="maxIdleTime" value="${jdbc.maxIdleTime}"/>  
+        <!-- 当连接池中的连接耗尽的时候c3p0一次同时获取的连接数. Default:3-->  
+        <property name="acquireIncrement" value="${jdbc.acquireIncrement}"/>  
+        <!-- JDBC的标准,用以控制数据源内加载的PreparedStatements数量。  
+        但由于预缓存的statements属于单个connection而不是整个连接池所以设置这个参数需要考虑到多方面的因数.如果maxStatements与maxStatementsPerConnection均为0,则缓存被关闭。Default:0-->  
+        <property name="maxStatements" value="${jdbc.maxStatements}"/>  
+        <!-- 每60秒检查所有连接池中的空闲连接.Default:0 -->  
+        <property name="idleConnectionTestPeriod" value="${jdbc.idleConnectionTestPeriod}"/>  
+    </bean> 
+
+	<!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocations" value="classpath:com/oracle/mapping/*.xml"/>
+
+	</bean>
+
+	<!-- DAO接口所在包名，Spring会自动查找其下自动扫描将Mapper接口生成代理注入到Spring-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.oracle.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+	</bean>
+	<!-- 使用ehcache 整合mybatis不需要配置，使用mybatis的配置,参考UserMapper.xml文件-->
+
+	
+
+  
+</beans>

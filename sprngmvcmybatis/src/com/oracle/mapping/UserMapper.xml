@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.oracle.dao.UserDao" >
+<!-- 使用mybatis自带的缓存mybatis-3.2.7.jar的org.apache.ibatis.cache的Cache -->
+<!--   <cache/> -->
+<!-- 使用第三方的ehcache需要jar是mybatis-ehcache-1.0.3.jar和ehcache-core-2.6.8.jar -->
+<!-- 委托的dao输出日志 -->
+<!-- [com.oracle.dao.UserDao] - Cache Hit Ratio [com.oracle.dao.UserDao]: 0.5 -->
+<!-- <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/> -->
+ <cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+  <select id="getUserById" resultType="com.oracle.model.User" parameterType="java.lang.Integer" >
+    select id, username from t_user where id = #{id}
+  </select>
+
+
+</mapper>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- EhCache在每次启动的时候都要连接到 ehcache 网站上去检查新版本 所以配置 updateCheck="false" 不要检查-->
+<ehcache updateCheck="false">
+	<diskStore path="d://mycache" /> 
+	<defaultCache 
+		maxElementsInMemory="10" 
+		eternal="false"
+		timeToIdleSeconds="100000" 
+		timeToLiveSeconds="1800"
+		overflowToDisk="true"  
+		memoryStoreEvictionPolicy="LRU"/> 
+	 
+	<cache name="myehcache" 
+		maxElementsInMemory="3000" 
+		overflowToDisk="true" 
+		maxElementsOnDisk="3000"
+		eternal="false"
+		timeToIdleSeconds="18000" 
+		timeToLiveSeconds="36000" /> 
+</ehcache>
